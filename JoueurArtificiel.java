@@ -53,13 +53,29 @@ public class JoueurArtificiel implements Joueur {
             return 1;
         }
     }
-    private int getVoisins(int case_c, String direction){
+    //TODO
+    private int getPoints(ArrayList pions){
+        ArrayList visites;
+        int points = 0;
+        for (int pion : pions){
+            ArrayList voisins = getVoisins(pion, "ALL");
+            for (int v : voisins){
+                while (pions.contains(v)){
+                    String direction = getDirection(pion, voisin);
+                    v = getVoisins(v, direction);
+
+                }
+            }
+        }
+    }
+    private ArrayList getAllVoisins(int case_c){
         ArrayList voisins;
-        int point = 0;
+        //TODO
+        return voisins;
+    }
+    //TODO
+    private int getVoisins(int case_c, String direction){
         switch(direction){
-            case "ALL":
-                return voisins;
-                break;
             case "NORD":
             case "SUD":
             case "EST":
@@ -71,7 +87,9 @@ public class JoueurArtificiel implements Joueur {
         }
 
     }
-
+    private String getDirection(int source, int destination){
+        //TODO
+    }
  
 
 
