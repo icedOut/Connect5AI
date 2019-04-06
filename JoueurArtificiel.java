@@ -27,14 +27,49 @@ public class JoueurArtificiel implements Joueur {
     @Override
     public Position getProchainCoup(Grille grille, int delais) {
         ArrayList<Integer> casesvides = new ArrayList<Integer>();
+        ArrayList<Integer> pionsJ1 = new ArrayList<Integer>();
+        ArrayList<Integer> pionsJ2 = new ArrayList<Integer>();
         int nbcol = grille.getData()[0].length;
-        for(int l=0;l<grille.getData().length;l++)
-            for(int c=0;c<nbcol;c++)
-                if(grille.getData()[l][c]==0)
+        for(int l=0;l<grille.getData().length;l++){
+            for(int c=0;c<nbcol;c++) {
+                if(grille.getData()[l][c]==0){
                     casesvides.add(l*nbcol+c);
+                } else if (grille.getData()[l][c]==1){
+                    pionsJ1.add(l*nbcol+c);
+                } else if (grille.getData()[l][c]==2){
+                    pionsJ2.add(l*nbcol+c);
+                }
+            }
+        }
+
         int choix = random.nextInt(casesvides.size());
         choix = casesvides.get(choix);
         return new Position(choix / nbcol, choix % nbcol);
+    }
+    private int getJoueurCourant(ArrayList j1, ArrayList j2){
+        if(j1.size() > j2.size()){
+            return 2;
+        } else if(j1.size() == j2.size()){
+            return 1;
+        }
+    }
+    private int getVoisins(int case_c, String direction){
+        ArrayList voisins;
+        int point = 0;
+        switch(direction){
+            case "ALL":
+                return voisins;
+                break;
+            case "NORD":
+            case "SUD":
+            case "EST":
+            case "OUEST":
+            case "NORD-OUEST":
+            case "SUD-OUEST":
+            case "NORD-EST":
+            case "SUD-EST":
+        }
+
     }
 
  
