@@ -41,56 +41,80 @@ public class JoueurArtificiel implements Joueur {
                 }
             }
         }
+        eval(Grille);
 
         int choix = random.nextInt(casesvides.size());
         choix = casesvides.get(choix);
         return new Position(choix / nbcol, choix % nbcol);
-    }
-    private int getJoueurCourant(ArrayList j1, ArrayList j2){
-        if(j1.size() > j2.size()){
-            return 2;
-        } else if(j1.size() == j2.size()){
-            return 1;
-        }
-    }
-    //TODO
-    private int getPoints(ArrayList pions){
-        ArrayList visites;
-        int points = 0;
-        for (int pion : pions){
-            ArrayList voisins = getVoisins(pion, "ALL");
-            for (int v : voisins){
-                while (pions.contains(v)){
-                    String direction = getDirection(pion, voisin);
-                    v = getVoisins(v, direction);
 
-                }
+        private int getJoueurCourant(ArrayList j1, ArrayList j2){
+            if(j1.size() > j2.size()){
+                return 1;
+            } else if(j1.size() == j2.size()){
+                return 0;
             }
         }
-    }
-    private ArrayList getAllVoisins(int case_c){
-        ArrayList voisins;
-        //TODO
-        return voisins;
-    }
-    //TODO
-    private int getVoisins(int case_c, String direction){
-        switch(direction){
-            case "NORD":
-            case "SUD":
-            case "EST":
-            case "OUEST":
-            case "NORD-OUEST":
-            case "SUD-OUEST":
-            case "NORD-EST":
-            case "SUD-EST":
-        }
+
+
+        private int eval(Grille grille){
+        int pointsJ1 = 0;
+        int pointsJ2 = 0;
+
+        // Parcours des colonnes
+        for(int l=0;l<grille.getData().length;l++){
+            for(int c=0;c<grille.getData()[0].length;c++){
+             if(grille.getData()[l][c]==0){
+                if (grille.geData()[l][c+1] == 0 && grille.getData()[l][c+2] == 0 && grille.getData()[l][c+3] == 0 {
+                    pointsJ1 = pointsJ1 + 1000;
+                    c=c+3;
+                }else if(grille.getData()[l][c+1]==0 && grille.getData()[l][c+2]==0){
+                  pointsJ1 = pointsJ1 + 100;
+                  c=c+2;
+                }else if(grille.getData()[l][c+1]==0){
+                 pointsJ1 = pointsJ1 + 10;
+                 c = c+1;
+                }else{
+                    pointsJ1= pointsJ1 + 1 ;
+                }      
+             }   
+            }
+        }       
+        // Parcours des lignes
+    for(int c=0;c<grille.getData()[0].length;c++){
+          for(int l=0;l<grille.getData().length;l++){
+             if(grille.getData()[l][c]==0){
+                if (grille.geData()[l][c+1] == 0 && grille.getData()[l][c+2] == 0 && grille.getData()[l][c+3] == 0 {
+                    pointsJ1 = pointsJ1 + 1000;
+                    c=c+3;
+                }else if(grille.getData()[l][c+1]==0 && grille.getData()[l][c+2]==0){
+                  pointsJ1 = pointsJ1 + 100;
+                  c=c+2;
+                }else if(grille.getData()[l][c+1]==0){
+                 pointsJ1 = pointsJ1 + 10;
+                 c = c+1;
+                }else{
+                    pointsJ1= pointsJ1 + 1 ;
+                }
+            }
+          }
+        }             
+        
+        // Parcours des diagonales  
+            //todo       
+             
+      
+       }
 
     }
-    private String getDirection(int source, int destination){
-        //TODO
-    }
+   
+   
+
+   
+  
  
+
+
+
 
 
 }
