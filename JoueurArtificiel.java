@@ -58,8 +58,6 @@ public class JoueurArtificiel implements Joueur {
 
         private int eval(Grille grille){
         int pointsJ1 = 0;
-        int pointsJ2 = 0;
-
         // Parcours des colonnes
         for(int l=0;l<grille.getData().length;l++){
             for(int c=0;c<grille.getData()[0].length;c++){
@@ -83,13 +81,13 @@ public class JoueurArtificiel implements Joueur {
     for(int c=0;c<grille.getData()[0].length;c++){
           for(int l=0;l<grille.getData().length;l++){
              if(grille.getData()[l][c]==0){
-                if (grille.geData()[l][c+1] == 0 && grille.getData()[l][c+2] == 0 && grille.getData()[l][c+3] == 0 {
+                if (grille.geData()[l+1][c] == 0 && grille.getData()[l+2][c] == 0 && grille.getData()[l+3][c] == 0 {
                     pointsJ1 = pointsJ1 + 1000;
                     c=c+3;
-                }else if(grille.getData()[l][c+1]==0 && grille.getData()[l][c+2]==0){
+                }else if(grille.getData()[l+1][c]==0 && grille.getData()[l+2][c]==0){
                   pointsJ1 = pointsJ1 + 100;
                   c=c+2;
-                }else if(grille.getData()[l][c+1]==0){
+                }else if(grille.getData()[l+1][c]==0){
                  pointsJ1 = pointsJ1 + 10;
                  c = c+1;
                 }else{
@@ -101,20 +99,11 @@ public class JoueurArtificiel implements Joueur {
         
         // Parcours des diagonales  
             //todo       
-             
-      
+               
        }
 
     }
    
-   
-
-   
-  
- 
-
-
-
 
 
 }
