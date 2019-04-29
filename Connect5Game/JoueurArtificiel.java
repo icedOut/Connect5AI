@@ -3,10 +3,6 @@ package Connect5Game;
 import java.util.ArrayList;
 import java.util.Random;
 
-import Connect5Game.Grille;
-import Connect5Game.Joueur;
-import Connect5Game.Position;
-
 
 public class JoueurArtificiel implements Joueur {
 
