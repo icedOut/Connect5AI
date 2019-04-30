@@ -1,6 +1,9 @@
 package Connect5Game;
 
+import java.awt.*;
+import java.sql.SQLOutput;
 import java.util.*;
+import java.util.List;
 
 
 public class JoueurArtificiel implements Joueur {
@@ -29,10 +32,13 @@ public class JoueurArtificiel implements Joueur {
         int alpha = Integer.MAX_VALUE ;
         int beta =  Integer.MIN_VALUE ;
 
+        int profondeur = 1 ;
+
+
         // evalMeilleurCoup(grille);
 
         // liste cases vides
-        List<Position> casesvides = new ArrayList<>();
+        Deque<Position> casesvides = new ArrayDeque<>() ;
 
         // liste cases jouer 1
         List<Position> casesJouer1 = new ArrayList<>();
@@ -62,7 +68,17 @@ public class JoueurArtificiel implements Joueur {
 
         //int nbcol = grille.getData()[0].length ;
         //int choix = random.nextInt(casesvides.size());
-        Position  choix = minMax(grille,casesvides,delais) ;
+
+        Position  choix = new Position(0,0) ;
+
+        while (profondeur <= grille.nbLibre()) {
+            choix = meilleurCoupMinMax(grille, profondeur) ;
+            System.out.println("cases libres : " + grille.nbLibre());
+        }
+
+        //System.out.println( "position : " + "i :" + choix.ligne);
+        //System.out.println( "position : " + "j :" + choix.colonne);
+
         return choix ;
     }
 
@@ -129,7 +145,7 @@ public class JoueurArtificiel implements Joueur {
             for( int c = 0 ; c <= l ; c++ ) {
                 int i = l - c;
                 if( i < grille.data.length && c < grille.data[0].length ) {
-                    System.out.print( grille.get(i,c) + " " );
+                    // System.out.print( grille.get(i,c) + " " );
 
                     while (grille.get(i,c) == numeroJouer &&
                             i < grille.data.length - 1  && c < grille.data[0].length - 1){
@@ -162,13 +178,11 @@ public class JoueurArtificiel implements Joueur {
                 c2 = 0;
             }
             for (; c2 < grille.data[0].length && l < grille.data.length; c2++, l++) {
-                System.out.print( grille.get(l,c2) + " " );
+                // System.out.print( grille.get(l,c2) + " " );
 
                 while (grille.get(l,c2) == numeroJouer &&
                         l < grille.data.length - 1  && c < grille.data[0].length - 1){
                     suitePionJoueur += 1;
-                    System.out.println("\nINNER WHILE");
-                    System.out.println( grille.get(l,c2) + " " + "\n-------------\n" );
                     c += 1;
                     l += 1;
                 }
@@ -193,28 +207,27 @@ public class JoueurArtificiel implements Joueur {
     //public int minMax (Grille grille, int profondeur, int alpha,
     //                   int beta, boolean max, List<Position> casesVides ) {
 
-    public Position minMax (Grille grille, List<Position> casesVides, int delais ) {
+    public Position minMax (Grille grille, Deque<Position> casesVides, int delais ) {
 
-        tempsExec =  System.currentTimeMillis() +  delais ;
+
+        //Partie nulle
+        if (grille.nbLibre() == 0 ) {
+            return new Position (0,0) ;
+        }
+
+        tempsExec =  System.currentTimeMillis() + delais + (long) Math.floor(delais * 0.1);
         Map<Integer,Position> meilleurCoup =  new TreeMap<>() ;
         Grille grilleClone = grille.clone();
 
         int iter = 0 ;
 
         boolean conditionTemps = false ;
-        while (iter < casesVides.size() && !conditionTemps ) {
-            Position pos = casesVides.get(iter);
+        while (!casesVides.isEmpty() && !conditionTemps ) {
+            Position pos = casesVides.pollFirst();
             grilleClone.set(pos, numeroJouer);
             meilleurCoup.put(evalMeilleurCoup(grilleClone), pos);
             conditionTemps = tempsExec < System.currentTimeMillis();
-            iter++;
         }
-
-
-        // Partie nulle
-        //if (casesVides.size() == 0 ) {
-        //    return 0 ;
-        //}
 
         return  (((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue()) ;
     }
@@ -223,13 +236,172 @@ public class JoueurArtificiel implements Joueur {
 
 
 
+    private Position meilleurCoupMinMax (Grille grille, int profondeur) {
+
+        int initAlpha = Integer.MIN_VALUE ;
+        int initBeta  = Integer.MAX_VALUE ;
+
+        Map<Integer,Position> meilleurCoup =  new TreeMap<>() ;
+
+        //TreeSet<Position> coupDisponibles = coupDisponibles(grille) ;
+        Deque<Position> coupDisponibles = coupsDisponibles(grille) ;
+
+        System.out.println("inside MEILLEUR COUP");
+
+        boolean condition = true ;
+
+        while (!coupDisponibles.isEmpty() ) {
+            Position currentCoup  = coupDisponibles.pollFirst() ;
+           if ( tempsExec > System.currentTimeMillis()) {
+               System.out.println("inside meilleur Valeur ");
+               int meilleurValeur = minMax(grille, profondeur , initAlpha, initBeta, false) ;
+               meilleurCoup.put(meilleurValeur, currentCoup) ;
+           } else {
+               return new Position(0,0) ;
+           }
+
+        }
+
+        return ((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue() ;
+    }
+
+
+    private int minMax (Grille grille, int profondeur, int alpha, int beta, boolean minFlag) {
+
+        if (grille.nbLibre() == 0) {
+            return 0;
+        }
+
+        if (profondeur == 0) {
+            System.out.println("Profondeur : "  + profondeur);
+            return evalMeilleurCoup(grille) ;
+        }
+
+
+        // using lambda expression instead of Comparator
+        //TreeSet<Position> casesVides = coupDisponibles(grille) ;
+            Deque<Position> casesVides = coupsDisponibles(grille) ;
+        boolean condition =  false ;
+
+
+
+        if (minFlag) {
+
+            System.out.println("inside minFlag" );
+            while (!casesVides.isEmpty() && !condition ) {
+                Position currentPos = casesVides.pollFirst();
+                Grille prochainCoup = grille.clone() ;
+                prochainCoup.set(currentPos, numeroJouer) ;
+
+                System.out.println(" cases dispo minFlag : " +  casesVides.size());
+
+                if (tempsExec > System.currentTimeMillis()) {
+                    alpha = Math.max(alpha, minMax(prochainCoup, profondeur -1 , alpha, beta , false)) ;
+                    if (beta <= alpha) {
+                        break;
+                    }else {
+                        return 0 ;
+                    }
+                }
+            }
+
+        } else  {
+            System.out.println("inside else " );
+            while(!casesVides.isEmpty() && !condition ) {
+                Position currentPos = casesVides.pollFirst();
+                System.out.println(" cases dispo else : " +  casesVides.size());
+                Grille prochainCoup = grille.clone() ;
+                prochainCoup.set(currentPos, numeroJouer) ;
+                if (tempsExec > System.currentTimeMillis()) {
+                    beta = Math.min(beta, minMax(prochainCoup, profondeur -1 , alpha, beta , true) );
+                }
+                if (beta <= alpha) {
+                    break;
+                }else {
+                    return 0 ;
+                }
+            }
+        }
+
+        System.out.println("cases vides :" + casesVides.size());
+
+        return beta ;
+    }
 
 
 
 
+    private int evalVoisin (Grille grille, Position position) {
+
+        int pos_x = position.colonne ;
+        int pos_y = position.ligne ;
+        int LIGNES = grille.data.length ;
+        int COLONNES = grille.data[0].length ;
+        int currentVal ;
+        int nbrVoisins = 0 ;
+
+        for ( int i =  Math.max( 0, pos_x-1 )  ; i <= Math.min (pos_x+1, LIGNES-1) ; ++i ){
+
+            for ( int j =  Math.max(0, pos_y-1) ; j <= Math.min (pos_y+1, COLONNES-1); ++j ){
+
+                if ( ! ( i== pos_x && j== pos_y ) ) {
+                    currentVal = grille.get(position) ;
+                    if (currentVal == numeroJouer){
+                        nbrVoisins += 1;
+                    }
+                }
+            }
+        }
+        return nbrVoisins;
+    }
 
 
 
+    private TreeSet<Position> coupDisponibles(Grille grille) {
+
+        // using lambda expression instead of Comparator
+        TreeSet<Position> casesVides = new TreeSet<>((o1, o2) -> {
+            int valeurPos1 = evalVoisin(grille, o1);
+            int valeurPos2 = evalVoisin(grille, o2);
+            if (valeurPos1 < valeurPos2) {
+                return -1;
+            } else if (valeurPos1 > valeurPos2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        // charger les cases vides
+        for(int l=0;l<grille.getData().length;l++) {
+            for(int c=0;c<grille.getData()[0].length;c++) {
+                Position pos = new Position(l,c);
+                if(grille.getData()[l][c]==0) {
+                    casesVides.add(pos);
+                }
+            }
+        }
+
+        return casesVides ;
+
+    }
+
+
+
+    private Deque<Position> coupsDisponibles (Grille grille) {
+
+        Deque<Position> coups = new ArrayDeque<>() ;
+
+        for(int l=0;l<grille.getData().length;l++) {
+            for(int c=0;c<grille.getData()[0].length;c++) {
+                Position pos = new Position(l,c);
+                if(grille.getData()[l][c]==0) {
+                    coups.add(pos);
+                }
+            }
+        }
+        return coups ;
+    }
 
 
 
