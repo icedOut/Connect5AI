@@ -102,24 +102,18 @@ public class JoueurArtificiel implements Joueur {
         // Iteration horizontal
         for (int l = 0; l < grille.data.length; l++) {
             for (int c = 4; c < grille.data[0].length; c++) {
-                if (grille.get(l,c) == numeroJouer){
-                   suitePionJoueur += 1;
-                   c += 1;
-                   while(grille.get(l,c) == numeroJouer){
+                    while(grille.get(l,c) == numeroJouer){
                        suitePionJoueur += 1;
                        c += 1;
                    }
                    PointsJoueur += calculPoints(suitePionJoueur);
 
-                }else if ( grille.get(l,c) != numeroJouer && grille.get(l,c) != 0 ){
-                    suitePionAdv += 1;
-                    c += 1;
                     while(grille.get(l,c) != numeroJouer && grille.get(l,c) != 0){
                         suitePionAdv += 1;
                         c += 1;
                     }
                     PointsAdv += calculPoints(suitePionAdv);
-                }
+                
 
                 /*
                 System.out.println("---Iteration horizontale---");
