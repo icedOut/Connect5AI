@@ -1,12 +1,16 @@
 package Connect5Game;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 
 public class JoueurArtificiel implements Joueur {
 
     private final Random random = new Random();
+    private int pointage ;
+    private int numeroJouer ;
 
     /**
      * Voici la fonction à modifier.
@@ -23,43 +27,70 @@ public class JoueurArtificiel implements Joueur {
     @Override
     public Position getProchainCoup(Grille grille, int delais) {
 
-        ArrayList<Integer> casesvides = new ArrayList<Integer>();
-        int nbcol = grille.getData()[0].length;
+        int alpha = Integer.MAX_VALUE ;
+        int beta =  Integer.MIN_VALUE ;
+
+        numeroJouer = (grille.nbLibre() % 2 == 0) ? 1 : 2  ;
+
+        evalMeilleurCoup(grille);
+
+        // Extraire liste cases vides
+        List<Position> casesvides = new ArrayList<>();
+
+        // Extraire liste cases jouer 1
+        List<Position> casesJouer1 = new ArrayList<>();
+
+        // Extraire liste cases jouer 2
+        List<Position> casesJouer2 = new ArrayList<>();
+
 
         for(int l=0;l<grille.getData().length;l++) {
+            for(int c=0;c<grille.getData()[0].length;c++) {
 
-            for(int c=0;c<nbcol;c++) {
+                Position pos = new Position(l,c);
 
-                if(grille.getData()[l][c]==0)
-                    casesvides.add(l*nbcol+c);
+                if(grille.getData()[l][c]==0) {
+                    casesvides.add(pos);
+                } else if (grille.getData()[l][c]==1){
+                    casesJouer1.add(pos);
+                } else if (grille.getData()[l][c]==2) {
+                    casesJouer2.add(pos);
+                }
             }
-
         }
 
+        int nbcol = grille.getData()[0].length ;
         int choix = random.nextInt(casesvides.size());
-        choix = casesvides.get(choix);
+        Position  choix1 = casesvides.get(0);
         return new Position(choix / nbcol, choix % nbcol);
     }
 
 
+
     public int evalMeilleurCoup(Grille grille ) {
 
-        int result  = 0 ;
+        int resultEval  = 0 ;
 
         // Iteration horizontal
         for (int l = 0; l < grille.data.length; l++) {
-            for (int c = 0; c < grille.data[0].length; c++) {
+            for (int c = 4; c < grille.data[0].length; c++) {
 
-                // logique ici
+                System.out.println("---Iteration horizontale---");
+                System.out.println("ligne : " + l);
+                System.out.println("colonne : " + c );
+                System.out.println( "Value : " + grille.data[l][c]);
+
             }
 
         }
 
         // Iteration vertical
-        for (int c = 0; c < grille.data[0].length; c++) {
+        for (int c = 4; c < grille.data[0].length; c++) {
             for (int l = 0; l < grille.data.length; l++) {
 
-                // logique ici
+                System.out.println("---Iteration verticale---");
+                System.out.println("ligne : " + l);
+                System.out.println("colonne : " + c );
 
             }
 
@@ -70,8 +101,9 @@ public class JoueurArtificiel implements Joueur {
         for (int l = 4; l < grille.getData().length; l++) {
             for (int c = 4; c < grille.getData()[l].length; c++) {
 
-                // logique ici
-
+                System.out.println("- DIAGONALE \\\\  ---");
+                System.out.println("ligne : " + l);
+                System.out.println("colonne : " + c );
             }
         }
 
@@ -79,12 +111,26 @@ public class JoueurArtificiel implements Joueur {
         for (int l = grille.getData().length - 5; l >= 0; l--) {
             for (int c = 4; c < grille.getData()[l].length; c++) {
 
-                // logique ici
+                System.out.println("--- DIAGONALE /// ---");
+                System.out.println("ligne : " + l);
+                System.out.println("colonne : " + c );
 
             }
         }
 
 
-        return result ;
+        return resultEval ;
+    }
+
+
+
+    public int minMax (Grille grille, int profondeur, int alpha,
+                       int beta, boolean max, List<Position> casesVides ) {
+
+        if (casesVides.size() == 0 ) {
+            return 0 ;
+        }
+
+        return  0 ;
     }
 }
