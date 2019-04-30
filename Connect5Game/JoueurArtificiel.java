@@ -59,6 +59,14 @@ public class JoueurArtificiel implements Joueur {
             }
         }
 
+        // plus sécuritaire pour déterminer quel joueur ( A cause des cases obstruées)
+        /* if (casesJouer1.size()<casesJouer2.size() ){
+            numeroJouer = 1;
+        }else{
+            numeroJouer = 2;
+        }
+        */
+
         int nbcol = grille.getData()[0].length ;
         int choix = random.nextInt(casesvides.size());
         Position  choix1 = casesvides.get(0);
