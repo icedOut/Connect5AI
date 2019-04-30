@@ -8,6 +8,7 @@ public class JoueurArtificiel implements Joueur {
     private final Random random = new Random();
     private int pointage ;
     private int numeroJouer ;
+    private long tempsExec ;
 
 
     /**
@@ -40,38 +41,6 @@ public class JoueurArtificiel implements Joueur {
         List<Position> casesJouer2 = new ArrayList<>();
 
 
-        // iteration diagonal ///// de gauche a droite
-        // Diagonal //////
-
-        System.out.println( "GRILLE\n" + grille.toString() + "\n");
-
-
-
-
-
-
-/*
-        System.out.println("\nIteration en diagonale \\\\");
-
-        for (int c = -grille.data.length; c < grille.data[0].length; c++) {
-            int c2 = c;
-            int l = 0;
-            if (c2 < 0) {
-                l = -c2;
-                c2 = 0;
-            }
-            for (; c2 < grille.data[0].length && l < grille.data.length; c2++, l++) {
-                System.out.print( grille.get(l,c2) + " " );
-            }
-            System.out.println();
-        }
-*/
-
-
-
-
-
-
         for(int l=0;l<grille.getData().length;l++) {
             for(int c=0;c<grille.getData()[0].length;c++) {
 
@@ -91,10 +60,10 @@ public class JoueurArtificiel implements Joueur {
         // plus sécuritaire pour déterminer quel joueur ( A cause des cases obstruées)
         numeroJouer = ( casesJouer1.size() < casesJouer2.size() ) ? 1 : 2  ;
 
-        int nbcol = grille.getData()[0].length ;
-        int choix = random.nextInt(casesvides.size());
-        Position  choix1 = casesvides.get(0);
-        return new Position(choix / nbcol, choix % nbcol);
+        //int nbcol = grille.getData()[0].length ;
+        //int choix = random.nextInt(casesvides.size());
+        Position  choix = minMax(grille,casesvides,delais) ;
+        return choix ;
     }
 
 
@@ -115,14 +84,14 @@ public class JoueurArtificiel implements Joueur {
         // Iteration horizontal
         for (int l = 0; l < grille.data.length; l++) {
             for (int c = 0; c < grille.data[0].length; c++) {
-                while(grille.get(l,c) == numeroJouer && c < grille.data[0].length ){
+                while(grille.get(l,c) == numeroJouer && c < grille.data[0].length-1 ){
                     suitePionJoueur += 1;
                     c += 1;
                 }
                 pointsJoueur += calculPoints(suitePionJoueur);
 
                 while(grille.get(l,c) != numeroJouer &&
-                        grille.get(l,c) != 0 && c < grille.data[0].length){
+                        grille.get(l,c) != 0 && c < grille.data[0].length-1){
                     suitePionAdv += 1;
                     c += 1;
                 }
@@ -137,14 +106,14 @@ public class JoueurArtificiel implements Joueur {
         // Iteration vertical
         for (int c = 0; c < grille.data[0].length; c++) {
             for (int l = 0; l < grille.data.length; l++) {
-                while(grille.get(l,c) == numeroJouer && l < grille.data.length){
+                while(grille.get(l,c) == numeroJouer && l < grille.data.length - 1){
                     suitePionJoueur += 1;
                     l += 1;
                 }
                 pointsJoueur += calculPoints(suitePionJoueur);
 
                 while(grille.get(l,c) != numeroJouer
-                        && grille.get(l,c) != 0 && l <grille.data.length){
+                        && grille.get(l,c) != 0 && l <grille.data.length - 1){
                     suitePionAdv += 1;
                     l += 1;
                 }
@@ -224,18 +193,30 @@ public class JoueurArtificiel implements Joueur {
     //public int minMax (Grille grille, int profondeur, int alpha,
     //                   int beta, boolean max, List<Position> casesVides ) {
 
-    public int minMax (Grille grille, List<Position> casesVides ) {
+    public Position minMax (Grille grille, List<Position> casesVides, int delais ) {
 
+        tempsExec =  System.currentTimeMillis() +  delais ;
         Map<Integer,Position> meilleurCoup =  new TreeMap<>() ;
+        Grille grilleClone = grille.clone();
 
+        int iter = 0 ;
+
+        boolean conditionTemps = false ;
+        while (iter < casesVides.size() && !conditionTemps ) {
+            Position pos = casesVides.get(iter);
+            grilleClone.set(pos, numeroJouer);
+            meilleurCoup.put(evalMeilleurCoup(grilleClone), pos);
+            conditionTemps = tempsExec < System.currentTimeMillis();
+            iter++;
+        }
 
 
         // Partie nulle
-        if (casesVides.size() == 0 ) {
-            return 0 ;
-        }
+        //if (casesVides.size() == 0 ) {
+        //    return 0 ;
+        //}
 
-        return  0 ;
+        return  (((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue()) ;
     }
 
 
