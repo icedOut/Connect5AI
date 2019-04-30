@@ -34,6 +34,7 @@ public class JoueurArtificiel implements Joueur {
 
         int profondeur = 1 ;
 
+        tempsExec =  System.currentTimeMillis() + delais + (long) Math.floor(delais * 0.1);
 
         // evalMeilleurCoup(grille);
 
@@ -74,6 +75,7 @@ public class JoueurArtificiel implements Joueur {
         while (profondeur <= grille.nbLibre()) {
             choix = meilleurCoupMinMax(grille, profondeur) ;
             System.out.println("cases libres : " + grille.nbLibre());
+            profondeur++;
         }
 
         //System.out.println( "position : " + "i :" + choix.ligne);
@@ -250,17 +252,20 @@ public class JoueurArtificiel implements Joueur {
 
         boolean condition = true ;
 
-        while (!coupDisponibles.isEmpty() ) {
+       do{
             Position currentCoup  = coupDisponibles.pollFirst() ;
-           if ( tempsExec > System.currentTimeMillis()) {
+
+
+           // if ( tempsExec < System.currentTimeMillis()) {
                System.out.println("inside meilleur Valeur ");
                int meilleurValeur = minMax(grille, profondeur , initAlpha, initBeta, false) ;
                meilleurCoup.put(meilleurValeur, currentCoup) ;
-           } else {
-               return new Position(0,0) ;
-           }
+          // } else {
+            //    System.out.println("inside else meilleur Valeur ");
+            //    ((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue() ;
+           // }
 
-        }
+        }  while (!coupDisponibles.isEmpty() && tempsExec > System.currentTimeMillis()  ) ;
 
         return ((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue() ;
     }
