@@ -67,59 +67,148 @@ public class JoueurArtificiel implements Joueur {
 
 
 
+    private int calculPoints (int suitePion){
+        int reponse;
+        switch (suitePion){
+            case 1 :
+                reponse = 1;
+                break;
+            case 2 :
+                reponse = 10;
+                break;
+            case 3 :
+                reponse = 100;
+                break;
+            case 4 :
+                reponse = 1000;
+                break;
+            case 5 :
+                reponse = 10000;
+                break;
+            default:
+                reponse = -1;
+
+        }
+        return reponse;
+    }
+
     public int evalMeilleurCoup(Grille grille ) {
 
-        int resultEval  = 0 ;
+        int PointsJoueur = 0;
+        int PointsAdv = 0;
+        int suitePionJoueur = 0;
+        int suitePionAdv = 0;
 
         // Iteration horizontal
         for (int l = 0; l < grille.data.length; l++) {
             for (int c = 4; c < grille.data[0].length; c++) {
+                if (grille.get(l,c) == numeroJouer){
+                   suitePionJoueur += 1;
+                   c += 1;
+                   while(grille.get(l,c) == numeroJouer){
+                       suitePionJoueur += 1;
+                       c += 1;
+                   }
+                   PointsJoueur += calculPoints(suitePionJoueur);
 
+                }else if ( grille.get(l,c) != numeroJouer && grille.get(l,c) != 0 ){
+                    suitePionAdv += 1;
+                    c += 1;
+                    while(grille.get(l,c) != numeroJouer && grille.get(l,c) != 0){
+                        suitePionAdv += 1;
+                        c += 1;
+                    }
+                    PointsAdv += calculPoints(suitePionAdv);
+                }
+
+                /*
                 System.out.println("---Iteration horizontale---");
                 System.out.println("ligne : " + l);
                 System.out.println("colonne : " + c );
                 System.out.println( "Value : " + grille.data[l][c]);
-
+                */
             }
-
         }
-
+        suitePionJoueur = 0;
+        suitePionAdv = 0;
         // Iteration vertical
         for (int c = 4; c < grille.data[0].length; c++) {
             for (int l = 0; l < grille.data.length; l++) {
+                    while(grille.get(l,c) == numeroJouer){
+                        suitePionJoueur += 1;
+                        l += 1;
+                    }
+                    PointsJoueur += calculPoints(suitePionJoueur);
 
+                    while(grille.get(l,c) != numeroJouer && grille.get(l,c) != 0){
+                         suitePionAdv += 1;
+                         l += 1;
+                     }
+                     PointsAdv += calculPoints(suitePionAdv);
+             /*   
                 System.out.println("---Iteration verticale---");
                 System.out.println("ligne : " + l);
                 System.out.println("colonne : " + c );
-
-            }
-
+              */    
         }
-
+    }   
+        suitePionJoueur = 0;
+        suitePionAdv = 0;
 
         // iteration diagonal \\\\\ de gauche a droite
         for (int l = 4; l < grille.getData().length; l++) {
             for (int c = 4; c < grille.getData()[l].length; c++) {
+                while(grille.get(l,c) == numeroJouer){
+                    suitePionJoueur += 1;
+                    l += 1;
+                    c += 1;
+                }
+                PointsJoueur += calculPoints(suitePionJoueur);
 
+                while(grille.get(l,c) != numeroJouer && grille.get(l,c) != 0){
+                     suitePionAdv += 1;
+                     l += 1;
+                     c += 1;
+                 }
+                 PointsAdv += calculPoints(suitePionAdv);
+
+                /*
                 System.out.println("- DIAGONALE \\\\  ---");
                 System.out.println("ligne : " + l);
                 System.out.println("colonne : " + c );
+                */
             }
         }
+
+        suitePionJoueur = 0;
+        suitePionAdv = 0;
 
         // iteration diagonal ///// de droite a gauche
         for (int l = grille.getData().length - 5; l >= 0; l--) {
             for (int c = 4; c < grille.getData()[l].length; c++) {
+                while(grille.get(l,c) == numeroJouer){
+                    suitePionJoueur += 1;
+                    l -= 1;
+                    c += 1;
+                }
+                PointsJoueur += calculPoints(suitePionJoueur);
 
+                while(grille.get(l,c) != numeroJouer && grille.get(l,c) != 0){
+                     suitePionAdv += 1;
+                     l -= 1;
+                     c += 1;
+                 }
+                 PointsAdv += calculPoints(suitePionAdv);
+
+                /*
                 System.out.println("--- DIAGONALE /// ---");
                 System.out.println("ligne : " + l);
                 System.out.println("colonne : " + c );
+                */
 
             }
         }
-
-
-        return resultEval ;
+        return pointsJoueur - PointsAdv ;
     }
 
 
