@@ -76,7 +76,7 @@ public class JoueurArtificiel implements Joueur {
 
         while (profondeur <= grille.nbLibre()) {
             choix = meilleurCoupMinMax(grille, profondeur);
-            System.out.println("cases libres : " + grille.nbLibre());
+            //System.out.println("cases libres : " + grille.nbLibre());
             profondeur++;
         }
 
@@ -141,7 +141,6 @@ public class JoueurArtificiel implements Joueur {
         }
         suitePionJoueur = 0;
         suitePionAdv = 0;
-
         System.out.println("Iteration en diagonale ///");
         for (int l = 0; l < grille.data.length * 2; l++) {
             for (int c = 0; c <= l; c++) {
@@ -172,7 +171,6 @@ public class JoueurArtificiel implements Joueur {
 
         suitePionJoueur = 0;
         suitePionAdv = 0;
-
         // iteration diagonal \\\\ de droite a gauche
         for (int c = -grille.data.length; c < grille.data[0].length; c++) {
             int c2 = c;
@@ -199,7 +197,7 @@ public class JoueurArtificiel implements Joueur {
                     c += 1;
                     l += 1;
                 }
-                pointsJoueur += calculPoints(suitePionAdv);
+                pointsAdv += calculPoints(suitePionAdv);
                 suitePionJoueur = 0;
                 suitePionAdv = 0;
             }
@@ -246,15 +244,14 @@ public class JoueurArtificiel implements Joueur {
         //TreeSet<Position> coupDisponibles = coupDisponibles(grille) ;
         Deque<Position> coupDisponibles = coupsDisponibles(grille);
 
-        System.out.println("inside MEILLEUR COUP");
-
+        //System.out.println("inside MEILLEUR COUP");
         boolean condition = true;
 
         do {
             Position currentCoup = coupDisponibles.pollFirst();
 
             // if ( tempsExec < System.currentTimeMillis()) {
-            System.out.println("inside meilleur Valeur ");
+            //System.out.println("inside meilleur Valeur ");
             int meilleurValeur = minMax(grille, profondeur, initAlpha, initBeta, false);
             meilleurCoup.put(meilleurValeur, currentCoup);
             // } else {
@@ -274,7 +271,7 @@ public class JoueurArtificiel implements Joueur {
         }
 
         if (profondeur == 0) {
-            System.out.println("Profondeur : " + profondeur);
+            //System.out.println("Profondeur : " + profondeur);
             return evalMeilleurCoup(grille);
         }
 
@@ -285,14 +282,13 @@ public class JoueurArtificiel implements Joueur {
 
         if (minFlag) {
 
-            System.out.println("inside minFlag");
+            //System.out.println("inside minFlag");
             while (!casesVides.isEmpty() && !condition) {
                 Position currentPos = casesVides.pollFirst();
                 Grille prochainCoup = grille.clone();
                 prochainCoup.set(currentPos, numeroJouer);
 
-                System.out.println(" cases dispo minFlag : " + casesVides.size());
-
+                //System.out.println(" cases dispo minFlag : " + casesVides.size());
                 if (tempsExec > System.currentTimeMillis()) {
                     alpha = Math.max(alpha, minMax(prochainCoup, profondeur - 1, alpha, beta, false));
                     if (beta <= alpha) {
@@ -304,10 +300,10 @@ public class JoueurArtificiel implements Joueur {
             }
 
         } else {
-            System.out.println("inside else ");
+            //System.out.println("inside else ");
             while (!casesVides.isEmpty() && !condition) {
                 Position currentPos = casesVides.pollFirst();
-                System.out.println(" cases dispo else : " + casesVides.size());
+                //System.out.println(" cases dispo else : " + casesVides.size());
                 Grille prochainCoup = grille.clone();
                 prochainCoup.set(currentPos, numeroJouer);
                 if (tempsExec > System.currentTimeMillis()) {
@@ -321,8 +317,7 @@ public class JoueurArtificiel implements Joueur {
             }
         }
 
-        System.out.println("cases vides :" + casesVides.size());
-
+        //System.out.println("cases vides :" + casesVides.size());
         return beta;
     }
 
