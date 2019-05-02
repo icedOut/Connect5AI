@@ -2,7 +2,6 @@ package Connect5Game;
 
 import java.util.*;
 
-
 public class JoueurArtificiel implements Joueur {
 
     private int joueurCourant;
@@ -10,23 +9,24 @@ public class JoueurArtificiel implements Joueur {
     private int joueurAdversaire;
 
     /**
-     * Voici la fonction à modifier.
-     * Évidemment, vous pouvez ajouter d'autres fonctions dans JoueurArtificiel.
-     * Vous pouvez aussi ajouter d'autres classes, mais elles doivent être
-     * ajoutées dans le package connect5.ia.
-     * Vous de pouvez pas modifier les fichiers directement dans connect., car ils seront écrasés.
+     * Voici la fonction à modifier. Évidemment, vous pouvez ajouter d'autres
+     * fonctions dans JoueurArtificiel. Vous pouvez aussi ajouter d'autres
+     * classes, mais elles doivent être ajoutées dans le package connect5.ia.
+     * Vous de pouvez pas modifier les fichiers directement dans connect., car
+     * ils seront écrasés.
      *
-     * @param grille Grille reçu (état courrant). Il faut ajouter le prochain coup.
+     * @param grille Grille reçu (état courrant). Il faut ajouter le prochain
+     * coup.
      * @param delais Délais de rélexion en temps réel.
      * @return Retourne le meilleur coup calculé.
      */
     @Override
     public Position getProchainCoup(Grille grille, int delais) {
 
-        Position nextMove ;
+        Position nextMove;
         Position currentMove = null;
-        joueurCourant = determinerJouerTour(grille) ;
-        joueurAdversaire =  (joueurCourant == 1) ? 2 : 1 ;
+        joueurCourant = determinerJouerTour(grille);
+        joueurAdversaire = (joueurCourant == 1) ? 2 : 1;
         tempsExec = System.currentTimeMillis() + delais;
 
         int profondeur = 1;
@@ -40,72 +40,92 @@ public class JoueurArtificiel implements Joueur {
         return nextMove;
     }
 
-
-
+    /**
+     * Fonction qui retourne le meilleur coup à jouer après exploration de
+     * l'arbre
+     *
+     * @param grille Grille reçu avec l'état courant des coups
+     * @param profondeur Profondeur d'exploration de l'arbre
+     * @return Retourne la position à jouer pour maximiser les points du joueur
+     * artificiel et minimiser les points de l'adversaire.
+     */
     public Position decisionMiniMax(final Grille grille, int profondeur) {
 
-        int initAlpha = Integer.MIN_VALUE ;
-        int initBeta  = Integer.MAX_VALUE ;
+        int initAlpha = Integer.MIN_VALUE;
+        int initBeta = Integer.MAX_VALUE;
 
         PriorityQueue<Position> coupDisponibles = coupDisponibles(grille);
-        Map<Integer,Position> meilleurCoup =  new TreeMap<>() ;
+        Map<Integer, Position> meilleurCoup = new TreeMap<>();
 
         boolean maxFlag = false;
 
-        while (!coupDisponibles.isEmpty() )  {
+        while (!coupDisponibles.isEmpty()) {
 
             Position coup = coupDisponibles.poll();
             Grille nextMove = grille.clone();
             nextMove.set(coup, joueurCourant);
 
-            int currentVal = miniMax(nextMove, profondeur - 1, initAlpha, initBeta, maxFlag );
+            int currentVal = miniMax(nextMove, profondeur - 1, initAlpha, initBeta, maxFlag);
 
-            if(tempsExec > System.currentTimeMillis() ) {
+            if (tempsExec > System.currentTimeMillis()) {
                 if (currentVal > initAlpha) {
                     initAlpha = currentVal;
-                    meilleurCoup.put(initAlpha, coup) ;
+                    meilleurCoup.put(initAlpha, coup);
                 }
-            }
-            else {
-                return null ;
+            } else {
+                return null;
             }
         }
 
-        return ((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue() ;
+        return ((TreeMap<Integer, Position>) meilleurCoup).lastEntry().getValue();
     }
 
-
-    private int determinerJouerTour (Grille grille) {
-        boolean condition = (grille.getSize() - grille.nbLibre())% 2 == 0 ;
-        return condition  ? 1 : 2 ;
+    /**
+     * Fonction pour déterminer le numéro du joueur dont c'est le tour.
+     *
+     * @param grille Grille avec son état courant
+     * @return numéro du joueur
+     */
+    private int determinerJouerTour(Grille grille) {
+        boolean condition = (grille.getSize() - grille.nbLibre()) % 2 == 0;
+        return condition ? 1 : 2;
     }
 
-
+    /**
+     * Fonction qui évalue les coups possibles et procède à l'élagage alpha-beta
+     *
+     * @param grille Grille avec son état courant
+     * @param profondeur profondeur d'exploration
+     * @param alpha valeur qui représente la borne maximale des points
+     * @param beta valeur qui représente la borne minimale des points
+     * @param maxFlag flag qui indique si on doit maximiser ou minimiser les
+     * points
+     * @return retourne la valeur de l'évaluation du meilleur coup
+     */
     public int miniMax(final Grille grille, int profondeur, int alpha, int beta, boolean maxFlag) {
 
         GrilleVerificateur verif = new GrilleVerificateur();
 
-        int jouerCourant = determinerJouerTour(grille) ;
-        int adversaire = (joueurCourant == 1) ? 2 : 1 ;
-
+        int jouerCourant = determinerJouerTour(grille);
+        int adversaire = (joueurCourant == 1) ? 2 : 1;
+        // Vérifier gagnant sur la grille
         int gagnant = verif.determineGagnant(grille);
         if (gagnant != 0) {
             if (gagnant == joueurCourant) {
                 return 100000;
             }
         }
-
+        // Vérifier si la grille est remplie
         if (grille.nbLibre() == 0) {
             return 0;
         }
-
+        // Fin du parcours des coups possibles
         if (profondeur == 0) {
-            return evalMeilleurCoup(grille) ;
+            return evalMeilleurCoup(grille);
         }
 
-        PriorityQueue<Position> coupPossibles = coupDisponibles(grille) ;
-
-
+        PriorityQueue<Position> coupPossibles = coupDisponibles(grille);
+        // Alpha-Beta
         if (maxFlag) {
 
             while (!coupPossibles.isEmpty()) {
@@ -144,14 +164,24 @@ public class JoueurArtificiel implements Joueur {
         }
     }
 
-
-
-    private int calculPoints (int suitePion){
-        return (int)Math.pow(10, suitePion - 1);
+    /**
+     * Fonction pour calculer les points à partir d'une suite de pions trouvée
+     * sur la grille
+     *
+     * @param suitePion nombre de pions dans une suite continue sur la grille
+     * @return Retourne le nombre de points
+     */
+    private int calculPoints(int suitePion) {
+        return (int) Math.pow(10, suitePion - 1);
     }
 
-
-    private PriorityQueue <Position> coupDisponibles(Grille grille) {
+    /**
+     * Fonction qui trouve les coups disponibles à joueur à partir d'une grille
+     *
+     * @param grille Grille avec son état courant
+     * @return Retourne une file de position des cases vides
+     */
+    private PriorityQueue<Position> coupDisponibles(Grille grille) {
 
         // using lambda expression instead of Comparator
         PriorityQueue<Position> casesVides = new PriorityQueue<>((o1, o2) -> {
@@ -167,37 +197,42 @@ public class JoueurArtificiel implements Joueur {
         });
 
         // charger les cases vides
-        for(int l=0;l<grille.getData().length;l++) {
-            for(int c=0;c<grille.getData()[0].length;c++) {
-                Position pos = new Position(l,c);
-                if(grille.getData()[l][c]==0) {
+        for (int l = 0; l < grille.getData().length; l++) {
+            for (int c = 0; c < grille.getData()[0].length; c++) {
+                Position pos = new Position(l, c);
+                if (grille.getData()[l][c] == 0) {
                     casesVides.add(pos);
                 }
             }
         }
 
-        return casesVides ;
+        return casesVides;
 
     }
 
+    /**
+     * Fonction pour explorer les voisins d'une position sur la grille
+     *
+     * @param grille Grille avec son état courant
+     * @param position Position dont on veut explorer les voisins
+     * @return
+     */
+    private int evalVoisin(Grille grille, Position position) {
 
+        int pos_x = position.colonne;
+        int pos_y = position.ligne;
+        int lignes = grille.data.length;
+        int colonnes = grille.data[0].length;
+        int currentVal;
+        int nbrVoisins = 0;
 
-    private int evalVoisin (Grille grille, Position position) {
+        for (int i = Math.max(0, pos_x - 1); i <= Math.min(pos_x + 1, lignes - 1); ++i) {
 
-        int pos_x = position.colonne ;
-        int pos_y = position.ligne ;
-        int lignes = grille.data.length ;
-        int colonnes = grille.data[0].length ;
-        int currentVal ;
-        int nbrVoisins = 0 ;
+            for (int j = Math.max(0, pos_y - 1); j <= Math.min(pos_y + 1, colonnes - 1); ++j) {
 
-        for ( int i =  Math.max( 0, pos_x-1 )  ; i <= Math.min (pos_x+1, lignes-1) ; ++i ){
-
-            for ( int j =  Math.max(0, pos_y-1) ; j <= Math.min (pos_y+1, colonnes-1); ++j ){
-
-                if ( ! ( i== pos_x && j== pos_y ) ) {
-                    currentVal = grille.get(position) ;
-                    if (currentVal == joueurCourant){
+                if (!(i == pos_x && j == pos_y)) {
+                    currentVal = grille.get(position);
+                    if (currentVal == joueurCourant) {
                         nbrVoisins += 1;
                     }
                 }
@@ -206,9 +241,14 @@ public class JoueurArtificiel implements Joueur {
         return nbrVoisins;
     }
 
-
-
-
+    /**
+     * Fonction qui évalue les points du joueur et de son adversaire pour
+     * déterminer l'efficacité d'un coup
+     *
+     * @param grille Grille avec son état courant (incluant un possible prochain
+     * coup)
+     * @return
+     */
     public int evalMeilleurCoup(Grille grille) {
 
         int pointsJoueur = 0;
@@ -263,7 +303,6 @@ public class JoueurArtificiel implements Joueur {
         suitePionAdv = 0;
 
         // Iteration en diagonale ///
-
         for (int l = 0; l < grille.data.length * 2; l++) {
             for (int c = 0; c <= l; c++) {
                 int i = l - c;
@@ -324,72 +363,63 @@ public class JoueurArtificiel implements Joueur {
                 suitePionAdv = 0;
             }
         }
-        //System.out.println("joueur : " + pointsJoueur);
-        //System.out.println("adversaire : " + pointsAdv);
-        //System.out.println("retour Eval : " + (pointsJoueur - pointsAdv));
         return pointsJoueur - pointsAdv;
     }
-
 
     private Position utility(Grille grille) {
 
         int ROW_SIZE = grille.data.length;
-        int COL_SIZE = grille.data[0].length ;
+        int COL_SIZE = grille.data[0].length;
 
         // verifier si gagnant horizontal
-        for (int row=0; row<ROW_SIZE; row++) {
-            for (int col=0; col<COL_SIZE-4; col++) {
-                if (grille.data[row][col] == grille.data[row][col+1] &&
-                        grille.data[row][col] == grille.data[row][col+2] &&
-                        grille.data[row][col] == grille.data[row][col+3] &&
-                        grille.data[row][col+4] == 0 )
-                {
-                    return new Position(row,col+4) ;
+        for (int row = 0; row < ROW_SIZE; row++) {
+            for (int col = 0; col < COL_SIZE - 4; col++) {
+                if (grille.data[row][col] == grille.data[row][col + 1]
+                        && grille.data[row][col] == grille.data[row][col + 2]
+                        && grille.data[row][col] == grille.data[row][col + 3]
+                        && grille.data[row][col + 4] == 0) {
+                    return new Position(row, col + 4);
                 }
             }
         }
 
         // verifier si gagnant Vertical
-        for (int row=0; row<ROW_SIZE-4; row++) { //0 to 2
-            for (int col=0; col<COL_SIZE; col++) {
-                if (grille.data[row][col] == grille.data[row+1][col] &&
-                        grille.data[row][col] == grille.data[row+2][col] &&
-                        grille.data[row][col] == grille.data[row+3][col] &&
-                        grille.data[row+4][col] == 0)
-                {
-                    return new Position(row+4, col) ;
+        for (int row = 0; row < ROW_SIZE - 4; row++) { //0 to 2
+            for (int col = 0; col < COL_SIZE; col++) {
+                if (grille.data[row][col] == grille.data[row + 1][col]
+                        && grille.data[row][col] == grille.data[row + 2][col]
+                        && grille.data[row][col] == grille.data[row + 3][col]
+                        && grille.data[row + 4][col] == 0) {
+                    return new Position(row + 4, col);
                 }
             }
         }
 
-
         // verifier si gagnant diagonale ////
-        for (int row=0; row<ROW_SIZE-4; row++) { //0 to 2
-            for (int col=0; col<COL_SIZE-4; col++) { //0 to 3
-                if (grille.data[row][col] == grille.data[row+1][col+1] &&
-                        grille.data[row][col] == grille.data[row+2][col+2] &&
-                        grille.data[row][col] == grille.data[row+3][col+3] &&
-                        grille.data[row+4][col+4] == 0) {
-                    return new Position(row+4,col+4) ;
+        for (int row = 0; row < ROW_SIZE - 4; row++) { //0 to 2
+            for (int col = 0; col < COL_SIZE - 4; col++) { //0 to 3
+                if (grille.data[row][col] == grille.data[row + 1][col + 1]
+                        && grille.data[row][col] == grille.data[row + 2][col + 2]
+                        && grille.data[row][col] == grille.data[row + 3][col + 3]
+                        && grille.data[row + 4][col + 4] == 0) {
+                    return new Position(row + 4, col + 4);
                 }
             }
         }
 
         // verifier si gagnant diagonale \\\\
-        for (int row=4; row<ROW_SIZE; row++) { //3 to 5
-            for (int col=0; col<COL_SIZE-4; col++) { //0 to 3
-                if (grille.data[row][col] == grille.data[row-1][col+1] &&
-                        grille.data[row][col] == grille.data[row-2][col+2] &&
-                        grille.data[row][col] == grille.data[row-3][col+3] &&
-                        grille.data[row-4][col+4] == 0) {
-                    return new Position(row-4,col+4) ;
+        for (int row = 4; row < ROW_SIZE; row++) { //3 to 5
+            for (int col = 0; col < COL_SIZE - 4; col++) { //0 to 3
+                if (grille.data[row][col] == grille.data[row - 1][col + 1]
+                        && grille.data[row][col] == grille.data[row - 2][col + 2]
+                        && grille.data[row][col] == grille.data[row - 3][col + 3]
+                        && grille.data[row - 4][col + 4] == 0) {
+                    return new Position(row - 4, col + 4);
                 }
             }
         }
 
-        return null ;
+        return null;
     }
-
-
 
 }
